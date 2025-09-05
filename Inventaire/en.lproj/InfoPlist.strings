@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "Inventory requires your camera to save the photos to attached items.";
+
+"NSPhotoLibraryAddUsageDescription" = "Inventory can add your item photos to your library.";
