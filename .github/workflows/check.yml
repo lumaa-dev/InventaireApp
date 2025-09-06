@@ -25,7 +25,7 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode_26_beta_7.app || sudo xcode-select -s /Applications/Xcode_16.4.app
 
       - name: Build app
-        working-directory: InventaireApp
+        working-directory: Inventaire
         run: |
           xcodebuild clean archive \
             -workspace project.xcworkspace \
