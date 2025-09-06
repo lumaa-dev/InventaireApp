@@ -8,9 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clean Derived Data
-        run: rm -rf ~/Library/Developer/Xcode/DerivedData
+        run: |
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          rm -rf build/
 
-  build_ios:
+  build-ios:
     needs: clean
     runs-on: macos-latest
     steps:
@@ -18,12 +20,13 @@ jobs:
 
       - name: Build app
         run: |
+          cd Inventaire.xcodeproj
           xcodebuild -workspace project.xcworkspace \
                      -scheme Inventaire \
                      -configuration Release \
                      -destination generic/platform=iOS \
                      -derivedDataPath ./build \
-                     IPHONEOS_DEPLOYMENT_TARGET=15.1 \
+                     IPHONEOS_DEPLOYMENT_TARGET=18.0 \
                      CODE_SIGN_STYLE=Manual \
                      CODE_SIGNING_ALLOWED=NO \
                      CODE_SIGN_IDENTITY="" \
