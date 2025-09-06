@@ -11,6 +11,7 @@ jobs:
         run: |
           rm -rf ~/Library/Developer/Xcode/DerivedData
           rm -rf build/
+          xcodebuild clean
 
   build-ios:
     needs: clean
@@ -18,11 +19,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Select Xcode
+        run: xcode-select -s /Applications/Xcode_26_beta_7.app || xcode-select -s /Applications/Xcode_16.4.app
+
       - name: Build app
         run: |
           cd Inventaire.xcodeproj
           xcodebuild -workspace project.xcworkspace \
                      -scheme Inventaire \
+                     -sdk iphoneos
                      -configuration Release \
                      -destination generic/platform=iOS \
                      -derivedDataPath ./build \
