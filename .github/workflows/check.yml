@@ -1,0 +1,45 @@
+name: Check App
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean Derived Data
+        run: rm -rf ~/Library/Developer/Xcode/DerivedData
+
+  build_ios:
+    needs: clean
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build app
+        run: |
+          xcodebuild -workspace project.xcworkspace \
+                     -scheme Inventaire \
+                     -configuration Release \
+                     -destination generic/platform=iOS \
+                     -derivedDataPath ./build \
+                     IPHONEOS_DEPLOYMENT_TARGET=15.1 \
+                     CODE_SIGN_STYLE=Manual \
+                     CODE_SIGNING_ALLOWED=NO \
+                     CODE_SIGN_IDENTITY="" \
+                     ENABLE_USER_SCRIPT_SANDBOXING=NO
+
+      - name: Make ipa
+        run: |
+          mkdir -p Bundle
+          cp -r build/Build/Products/Release-iphoneos/Inventaire.app Bundle/
+          zip -r Inventaire.ipa Bundle
+          mv Inventaire.ipa build/Inventaire.ipa
+          rm -rf Bundle
+
+      - name: Upload ipa
+        uses: actions/upload-artifact@v4
+        with:
+          name: ipa
+          path: Bundle/Inventaire.ipa
+          if-no-files-found: error
