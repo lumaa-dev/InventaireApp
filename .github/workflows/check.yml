@@ -5,25 +5,34 @@ on:
 
 jobs:
   clean:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Clean Derived Data
-        run: |
-          rm -rf ~/Library/Developer/Xcode/DerivedData
-          rm -rf build/
-          xcodebuild clean
-
-  build-ios:
-    needs: clean
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
       - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.4.app
+        run: sudo xcode-select -s /Applications/Xcode_26_beta_7.app || sudo xcode-select -s /Applications/Xcode_16.app
 
+      - name: Clean Derived Data
+        working-directory: Inventaire.xcodeproj
+        run: |
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          rm -rf build/
+          xcodebuild clean \
+            -workspace project.xcworkspace \
+            -scheme Inventaire
+
+  build-ios:
+    needs: clean
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26_beta_7.app || sudo xcode-select -s /Applications/Xcode_16.app
+
+      - name: Verify Xcode version
+        run: xcodebuild -version
+        working-directory: Inventaire.xcodeproj
+        
       - name: Build app
         working-directory: Inventaire.xcodeproj
         run: |
@@ -39,16 +48,17 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             -skipMacroValidation \
             ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOLS=NO \
-            ASSETCATALOG_COMPILER_EXCLUDED_SOURCE_FILES="Preview Assets.xcassets"
+            ASSETCATALOG_COMPILER_EXCLUDED_SOURCE_FILES="Preview Assets.xcassets" \
+            DEVELOPMENT_ASSET_PATHS=""
 
       - name: Make ipa
         working-directory: Inventaire.xcodeproj
         run: |
-            cd build/Inventaire.xcarchive/Products
-            mv Applications Payload
-            cd ../
-            zip -r ../Inventaire.ipa Payload
-            rm -rf Payload
+          cd build/Inventaire.xcarchive/Products
+          mv Applications Payload
+          cd ..
+          zip -r ../Inventaire.ipa Payload
+          rm -rf Payload
 
       - name: Upload ipa
         uses: actions/upload-artifact@v4
