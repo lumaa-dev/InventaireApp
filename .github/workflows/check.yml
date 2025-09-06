@@ -25,7 +25,7 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode_26_beta_7.app || sudo xcode-select -s /Applications/Xcode_16.4.app
 
       - name: Build app
-        working-directory: Inventaire
+        working-directory: Inventaire.xcodeproj
         run: |
           xcodebuild clean archive \
             -workspace project.xcworkspace \
@@ -39,7 +39,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO
 
       - name: Make ipa
-        working-directory: InventaireApp
+        working-directory: Inventaire.xcodeproj
         run: |
             cd build/Inventaire.xcarchive/Products
             mv Applications Payload
@@ -51,5 +51,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ipa
-          path: InventaireApp/build/Inventaire.ipa
+          path: Inventaire.xcodeproj/build/Inventaire.ipa
           if-no-files-found: error
