@@ -26,7 +26,6 @@ jobs:
 
       - name: Build app
         run: |
-          cd Inventaire.xcodeproj
           xcodebuild clean archive \
             -workspace project.xcworkspace \
             -scheme Inventaire \
