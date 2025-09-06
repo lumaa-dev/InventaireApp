@@ -27,29 +27,29 @@ jobs:
       - name: Build app
         run: |
           cd Inventaire.xcodeproj
-          xcodebuild -workspace project.xcworkspace \
-                     -scheme Inventaire \
-                     -sdk iphoneos
-                     -configuration Release \
-                     -destination generic/platform=iOS \
-                     -derivedDataPath ./build \
-                     IPHONEOS_DEPLOYMENT_TARGET=26.0 \
-                     CODE_SIGN_STYLE=Manual \
-                     CODE_SIGNING_ALLOWED=NO \
-                     CODE_SIGN_IDENTITY="" \
-                     ENABLE_USER_SCRIPT_SANDBOXING=NO
+          xcodebuild clean archive \
+            -workspace project.xcworkspace \
+            -scheme Inventaire \
+            -sdk iphoneos \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/Inventaire.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
 
       - name: Make ipa
+        working-directory: InventaireApp
         run: |
-          mkdir -p Bundle
-          cp -r build/Build/Products/Release-iphoneos/Inventaire.app Bundle/
-          zip -r Inventaire.ipa Bundle
-          mv Inventaire.ipa build/Inventaire.ipa
-          rm -rf Bundle
+            cd build/Inventaire.xcarchive/Products
+            mv Applications Payload
+            cd ../
+            zip -r ../Inventaire.ipa Payload
+            rm -rf Payload
 
       - name: Upload ipa
         uses: actions/upload-artifact@v4
         with:
           name: ipa
-          path: Bundle/Inventaire.ipa
+          path: InventaireApp/build/Inventaire.ipa
           if-no-files-found: error
