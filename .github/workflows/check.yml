@@ -7,6 +7,8 @@ jobs:
   clean:
     runs-on: macos-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Clean Derived Data
         run: |
           rm -rf ~/Library/Developer/Xcode/DerivedData
